@@ -5,7 +5,7 @@ namespace ArcaneSurvival
 {
     public enum GameState { Title, Playing, Paused, GameOver }
 
-    // Scene entry point. The scene only needs this component; everything else is created here.
+    // Properties that store the games state
     public sealed class ArcaneGame : MonoBehaviour
     {
         public Camera WorldCamera { get; private set; }
@@ -39,7 +39,7 @@ namespace ArcaneSurvival
             public float Life = 0.4f;
         }
 
-        // Creates the camera, arena, player, sounds, and HUD, and loads the saved best score.
+        // Creates the camera, player, arena, etc every time the game starts
         private void Awake()
         {
             art = new PixelArt();
@@ -61,14 +61,13 @@ namespace ArcaneSurvival
             gameObject.AddComponent<GameHUD>().Initialize(this);
         }
 
-        // Adjusts the camera size to keep the entire arena visible as the window changes.
+        // Adjust the camera depending on the screen size
         private void FitCamera()
         {
-            // Keep the entire arena visible at narrow or wide window sizes.
             WorldCamera.orthographicSize = Mathf.Max(6.5f, 11.4f / Mathf.Max(0.1f, WorldCamera.aspect));
         }
 
-        // Creates the arena floor, borders, summoning ring, and decorative crystals.
+        // Creates the background and other elements
         private void BuildArena()
         {
             Transform floor = new GameObject("Arena artwork").transform;
@@ -100,13 +99,13 @@ namespace ArcaneSurvival
             }
         }
 
-        // Draws one rectangular border segment at the requested position and size.
+        // Creates a rectangular border
         private void Border(Transform root, Vector2 position, Vector2 size)
         {
             art.Draw("Arena border", art.Square, root, position, size, new Color32(70, 117, 130, 255), -16);
         }
 
-        // Clears the previous run and resets the player, score, timer, and wave.
+        // Resets the game
         public void StartRun()
         {
             ClearActors();
@@ -122,20 +121,19 @@ namespace ArcaneSurvival
             State = GameState.Playing;
         }
 
-        // Switches between playing and paused states, stopping sounds when paused.
+        // Pause the game or resume it
         public void TogglePause()
         {
             if (State == GameState.Playing) { State = GameState.Paused; Sounds.Stop(); }
             else if (State == GameState.Paused) State = GameState.Playing;
         }
 
-        // Pauses an active run when the game window loses focus.
         private void OnApplicationFocus(bool focused)
         {
             if (!focused && State == GameState.Playing) TogglePause();
         }
 
-        // Handles menu input and advances movement, spawning, collisions, and effects while playing.
+        // Handles menu and other inputs
         private void Update()
         {
             FitCamera();
@@ -153,7 +151,7 @@ namespace ArcaneSurvival
             if (GameInput.Pause) TogglePause();
             if (State != GameState.Playing) return;
 
-            // Limit jumps after a stall; swept spell collisions still cover the entire step.
+            // Deals with spell collisions
             float dt = Mathf.Min(Time.deltaTime, 0.05f);
             Elapsed += dt;
             NoticeTime = Mathf.Max(0, NoticeTime - dt);

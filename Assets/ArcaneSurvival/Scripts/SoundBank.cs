@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace ArcaneSurvival
 {
-    // Short synthesized sound effects avoid third-party audio dependencies.
+    // Short bank of sounds to avoid using third party audio
     public sealed class SoundBank
     {
         private readonly AudioSource source;
@@ -12,7 +12,7 @@ namespace ArcaneSurvival
         private readonly AudioClip heal;
         public bool Muted { get; private set; }
 
-        // Configures an audio source and generates the four gameplay sound effects.
+        // Generates 4 gameplay sound effects.
         public SoundBank(GameObject host)
         {
             source = host.AddComponent<AudioSource>();
@@ -25,7 +25,6 @@ namespace ArcaneSurvival
             heal = Tone("Healing", 440, 880, 0.35f);
         }
 
-        // Synthesizes a fading tone that changes frequency and returns it as an audio clip.
         private static AudioClip Tone(string name, float startHz, float endHz, float duration)
         {
             const int sampleRate = 22050;
@@ -44,19 +43,19 @@ namespace ArcaneSurvival
             return clip;
         }
 
-        // Plays the spell-casting sound at a reduced volume.
+        // Attack sound
         public void Cast() => source.PlayOneShot(cast, 0.5f);
-        // Plays the enemy-defeat sound.
+        // Enemie defeated
         public void Defeat() => source.PlayOneShot(defeat, 0.7f);
-        // Plays the sound for damage to the wizard.
+        // Damage taken
         public void Hurt() => source.PlayOneShot(hurt);
-        // Plays the health-restoration sound.
+        // Health restoration
         public void Heal() => source.PlayOneShot(heal);
-        // Toggles sound playback between muted and unmuted.
+        // Mute toggle
         public void ToggleMute() { Muted = !Muted; source.mute = Muted; }
-        // Stops sounds currently playing through this audio source.
+        // Stops sounds
         public void Stop() => source.Stop();
-        // Destroys the generated audio clips when they are no longer needed.
+        // Removes sounds when no longer needed
         public void Dispose()
         {
             Object.Destroy(cast);
