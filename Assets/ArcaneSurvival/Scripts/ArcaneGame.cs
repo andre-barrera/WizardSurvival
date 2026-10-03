@@ -5,7 +5,7 @@ namespace ArcaneSurvival
 {
     public enum GameState { Title, Playing, Paused, GameOver }
 
-    // Defines the information that the game needs
+    // Scene entry point. The scene only needs this component; everything else is created here.
     public sealed class ArcaneGame : MonoBehaviour
     {
         public Camera WorldCamera { get; private set; }
@@ -39,7 +39,7 @@ namespace ArcaneSurvival
             public float Life = 0.4f;
         }
 
-        // Creates different aspects of the game.Ex camera, arena, player, sounds etc
+        // Creates the camera, arena, player, sounds, and HUD, and loads the saved best score.
         private void Awake()
         {
             art = new PixelArt();
@@ -61,13 +61,14 @@ namespace ArcaneSurvival
             gameObject.AddComponent<GameHUD>().Initialize(this);
         }
 
-        // Adjusts the camer to fit in different screens
+        // Adjusts the camera size to keep the entire arena visible as the window changes.
         private void FitCamera()
         {
+            // Keep the entire arena visible at narrow or wide window sizes.
             WorldCamera.orthographicSize = Mathf.Max(6.5f, 11.4f / Mathf.Max(0.1f, WorldCamera.aspect));
         }
 
-        // Creates background and other objects
+        // Creates the arena floor, borders, summoning ring, and decorative crystals.
         private void BuildArena()
         {
             Transform floor = new GameObject("Arena artwork").transform;
@@ -99,13 +100,13 @@ namespace ArcaneSurvival
             }
         }
 
-        // Creates a border 
+        // Draws one rectangular border segment at the requested position and size.
         private void Border(Transform root, Vector2 position, Vector2 size)
         {
             art.Draw("Arena border", art.Square, root, position, size, new Color32(70, 117, 130, 255), -16);
         }
 
-        // Resets game to start all over again
+        // Clears the previous run and resets the player, score, timer, and wave.
         public void StartRun()
         {
             ClearActors();
@@ -121,19 +122,20 @@ namespace ArcaneSurvival
             State = GameState.Playing;
         }
 
-        // Pause toggles
+        // Switches between playing and paused states, stopping sounds when paused.
         public void TogglePause()
         {
             if (State == GameState.Playing) { State = GameState.Paused; Sounds.Stop(); }
             else if (State == GameState.Paused) State = GameState.Playing;
         }
 
+        // Pauses an active run when the game window loses focus.
         private void OnApplicationFocus(bool focused)
         {
             if (!focused && State == GameState.Playing) TogglePause();
         }
 
-        // Controls menu input  and other effects while playing.
+        // Handles menu input and advances movement, spawning, collisions, and effects while playing.
         private void Update()
         {
             FitCamera();
@@ -151,6 +153,7 @@ namespace ArcaneSurvival
             if (GameInput.Pause) TogglePause();
             if (State != GameState.Playing) return;
 
+            // Limit jumps after a stall; swept spell collisions still cover the entire step.
             float dt = Mathf.Min(Time.deltaTime, 0.05f);
             Elapsed += dt;
             NoticeTime = Mathf.Max(0, NoticeTime - dt);
@@ -173,7 +176,7 @@ namespace ArcaneSurvival
             TickSparks(dt);
         }
 
-        // Creates an enemy
+        // Spawns a wisp at an arena edge, choosing its type and keeping it away from the player.
         private void SpawnEnemy()
         {
             Vector2 position;
@@ -185,7 +188,7 @@ namespace ArcaneSurvival
             enemies.Add(new EnemyController(art, dynamicRoot, position, Wave, Wave >= 3 && Random.value < 0.3f));
         }
 
-        // It is used for the automatic targeting of an enemy
+        // Returns a direction toward the closest active enemy, or the fallback if none exist.
         public Vector2 DirectionToNearestEnemy(Vector2 origin, Vector2 fallback)
         {
             Vector2 direction = fallback;
@@ -201,14 +204,14 @@ namespace ArcaneSurvival
             return direction;
         }
 
-        // Creates a spell and sound
+        // Creates a spell at the supplied position and plays the casting sound.
         public void Cast(Vector2 origin, Vector2 direction)
         {
             spells.Add(new SpellProjectile(art, dynamicRoot, origin, direction));
             Sounds.Cast();
         }
 
-        // Movement of spells, and controls other things like healing, and awarding points
+        // Moves spells, awards points for hits, applies earned healing, and removes expired spells.
         private void TickSpells(float dt)
         {
             for (int i = spells.Count - 1; i >= 0; i--)
@@ -238,7 +241,8 @@ namespace ArcaneSurvival
             }
         }
 
-        // Removes defeated enemies, saves best score and check damage
+        // Removes defeated enemies, checks player contact damage, and saves a new best score at game over.
+        private void TickEnemyContact()
         {
             for (int i = enemies.Count - 1; i >= 0; i--)
             {
@@ -271,7 +275,7 @@ namespace ArcaneSurvival
             }
         }
 
-        // Special effects when an enemy is defeated or the player is hurt
+        // Creates a group of short-lived particles with random velocities at the hit position.
         private void Burst(Vector2 position, Color color, int count)
         {
             for (int i = 0; i < count; i++)
@@ -282,6 +286,7 @@ namespace ArcaneSurvival
             }
         }
 
+        // Moves and fades hit particles, removing them when their lifetime ends.
         private void TickSparks(float dt)
         {
             for (int i = sparks.Count - 1; i >= 0; i--)
@@ -294,7 +299,7 @@ namespace ArcaneSurvival
             }
         }
 
-        // Clears the list of enemies, spells and other other objects
+        // Destroys the current enemies, spells, and particles and clears their lists.
         private void ClearActors()
         {
             foreach (EnemyController enemy in enemies) Destroy(enemy.View.gameObject);
@@ -305,7 +310,7 @@ namespace ArcaneSurvival
             sparks.Clear();
         }
 
-        // Cleans resource generated by the game
+        // Releases the generated sound clips, textures, sprites, and material when this game is destroyed.
         private void OnDestroy()
         {
             Sounds?.Dispose();

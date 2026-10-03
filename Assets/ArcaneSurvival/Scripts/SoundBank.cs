@@ -2,7 +2,8 @@ using UnityEngine;
 
 namespace ArcaneSurvival
 {
-    // Sound effect bank
+    // Short synthesized sound effects avoid third-party audio dependencies.
+    public sealed class SoundBank
     {
         private readonly AudioSource source;
         private readonly AudioClip cast;
@@ -11,7 +12,7 @@ namespace ArcaneSurvival
         private readonly AudioClip heal;
         public bool Muted { get; private set; }
 
-        // Generates gameplay sound effects.
+        // Configures an audio source and generates the four gameplay sound effects.
         public SoundBank(GameObject host)
         {
             source = host.AddComponent<AudioSource>();
@@ -24,7 +25,7 @@ namespace ArcaneSurvival
             heal = Tone("Healing", 440, 880, 0.35f);
         }
 
-        // Modifies sounds depending of the state of the game.
+        // Synthesizes a fading tone that changes frequency and returns it as an audio clip.
         private static AudioClip Tone(string name, float startHz, float endHz, float duration)
         {
             const int sampleRate = 22050;
@@ -43,17 +44,17 @@ namespace ArcaneSurvival
             return clip;
         }
 
-        // Attacks
+        // Plays the spell-casting sound at a reduced volume.
         public void Cast() => source.PlayOneShot(cast, 0.5f);
-        // Enemy defeated
+        // Plays the enemy-defeat sound.
         public void Defeat() => source.PlayOneShot(defeat, 0.7f);
-        // Damage to the player
+        // Plays the sound for damage to the wizard.
         public void Hurt() => source.PlayOneShot(hurt);
-        // health restoration
+        // Plays the health-restoration sound.
         public void Heal() => source.PlayOneShot(heal);
-        // Mute toggle
+        // Toggles sound playback between muted and unmuted.
         public void ToggleMute() { Muted = !Muted; source.mute = Muted; }
-        // Stops sounds 
+        // Stops sounds currently playing through this audio source.
         public void Stop() => source.Stop();
         // Destroys the generated audio clips when they are no longer needed.
         public void Dispose()
