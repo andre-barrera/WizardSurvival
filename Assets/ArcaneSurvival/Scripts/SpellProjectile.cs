@@ -11,6 +11,7 @@ namespace ArcaneSurvival
         public float Lifetime = 1.6f;
         public const float Speed = 13;
 
+        // Creates the image of a spell and set its direction
         public SpellProjectile(PixelArt art, Transform parent, Vector2 position, Vector2 direction)
         {
             Position = position;
@@ -20,6 +21,7 @@ namespace ArcaneSurvival
             View.transform.rotation = Quaternion.Euler(0, 0, Mathf.Atan2(Direction.y, Direction.x) * Mathf.Rad2Deg);
         }
 
+        // Moves the spell
         public EnemyController Tick(float dt, List<EnemyController> enemies)
         {
             Vector2 previous = Position;

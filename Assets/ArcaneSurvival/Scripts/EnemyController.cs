@@ -14,6 +14,7 @@ namespace ArcaneSurvival
         public int Points => Fast ? 20 : 10;
         private readonly Color tint;
 
+        // Controls de enemy's possition, sepped and appearance
         public EnemyController(PixelArt art, Transform parent, Vector2 position, int wave, bool fast)
         {
             Position = position;
@@ -24,6 +25,7 @@ namespace ArcaneSurvival
                 position, Vector2.one * (fast ? 0.8f : 1), tint, 10);
         }
 
+        // Updates the enemy's appearance in the frames of the game
         public void Tick(float dt, Vector2 target, float elapsed)
         {
             SpawnDelay = Mathf.Max(0, SpawnDelay - dt);

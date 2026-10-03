@@ -12,11 +12,13 @@ namespace ArcaneSurvival
         private float castCooldown;
         public const float Speed = 4.5f;
 
+        // Creates the wizard
         public PlayerController(PixelArt art, Transform parent)
         {
             View = art.Draw("Wizard", art.Wizard, parent, Vector2.zero, Vector2.one, Color.white, 10);
         }
 
+        // Restores the player to the starting point
         public void Reset()
         {
             Position = Vector2.zero;
@@ -29,6 +31,7 @@ namespace ArcaneSurvival
             View.flipX = false;
         }
 
+        // Updates movement and other player states during the game
         public void Tick(float dt, ArcaneGame game)
         {
             Invulnerability = Mathf.Max(0, Invulnerability - dt);
@@ -37,12 +40,11 @@ namespace ArcaneSurvival
             Position = GameRules.ClampToArena(Position + movement * (Speed * dt));
             if (movement.sqrMagnitude > 0) Facing = movement;
 
-            // Mouse casts toward the pointer; Space aims toward the nearest enemy.
-            Vector2 aim = GameInput.MouseFire
-                ? ((Vector2)game.WorldCamera.ScreenToWorldPoint(GameInput.MousePosition) - Position).normalized
-                : game.DirectionToNearestEnemy(Position, Facing);
+            // Aims toward the mouse cursor.
+            Vector2 aim = ((Vector2)game.WorldCamera.ScreenToWorldPoint(
+                GameInput.MousePosition) - Position).normalized;
             if (aim.sqrMagnitude < 0.01f) aim = Facing;
-            if ((GameInput.MouseFire || GameInput.SpaceHeld) && castCooldown <= 0)
+            if (GameInput.MouseFire && castCooldown <= 0)
             {
                 game.Cast(Position, aim);
                 castCooldown = 0.24f;
@@ -56,6 +58,7 @@ namespace ArcaneSurvival
                 ? new Color(1, 1, 1, 0.35f) : Color.white;
         }
 
+        // Removes 1 health
         public bool TakeDamage()
         {
             if (Invulnerability > 0 || Health <= 0) return false;
@@ -64,6 +67,7 @@ namespace ArcaneSurvival
             return true;
         }
 
+        // Restores 1 health
         public void Heal() => Health = Mathf.Min(GameRules.MaxHealth, Health + 1);
     }
 }

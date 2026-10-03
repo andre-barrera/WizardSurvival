@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace ArcaneSurvival
 {
-    // Original code-generated pixel art; no external textures or downloads.
     public sealed class PixelArt
     {
         public readonly Sprite Wizard;
@@ -13,6 +12,7 @@ namespace ArcaneSurvival
         public readonly Material Material;
         private readonly List<Object> owned = new List<Object>();
 
+        // Creates the game art using pixel patterns
         public PixelArt()
         {
             Material = new Material(Resources.Load<Shader>("ArcaneSprite"));
@@ -35,6 +35,7 @@ namespace ArcaneSurvival
             Circle = Shape(true);
         }
 
+        // Converts rows of palette characters into a pixel texture and a centered sprite.
         private Sprite Pattern(string[] rows)
         {
             int width = rows[0].Length;
@@ -51,6 +52,7 @@ namespace ArcaneSurvival
             return sprite;
         }
 
+        // creates circle sprite
         private Sprite Shape(bool circle)
         {
             const int size = 32;
@@ -85,6 +87,7 @@ namespace ArcaneSurvival
             }
         }
 
+        // Creates and objet and set how the sprite appears
         public SpriteRenderer Draw(string name, Sprite sprite, Transform parent,
             Vector2 position, Vector2 scale, Color color, int order)
         {
@@ -100,6 +103,7 @@ namespace ArcaneSurvival
             return renderer;
         }
 
+        // Restarts sprites
         public void Dispose()
         {
             foreach (Object asset in owned) Object.Destroy(asset);

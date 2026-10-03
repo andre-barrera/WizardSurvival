@@ -2,8 +2,7 @@ using UnityEngine;
 
 namespace ArcaneSurvival
 {
-    // Short synthesized sound effects avoid third-party audio dependencies.
-    public sealed class SoundBank
+    // Sound effect bank
     {
         private readonly AudioSource source;
         private readonly AudioClip cast;
@@ -12,6 +11,7 @@ namespace ArcaneSurvival
         private readonly AudioClip heal;
         public bool Muted { get; private set; }
 
+        // Generates gameplay sound effects.
         public SoundBank(GameObject host)
         {
             source = host.AddComponent<AudioSource>();
@@ -24,6 +24,7 @@ namespace ArcaneSurvival
             heal = Tone("Healing", 440, 880, 0.35f);
         }
 
+        // Modifies sounds depending of the state of the game.
         private static AudioClip Tone(string name, float startHz, float endHz, float duration)
         {
             const int sampleRate = 22050;
@@ -42,12 +43,19 @@ namespace ArcaneSurvival
             return clip;
         }
 
+        // Attacks
         public void Cast() => source.PlayOneShot(cast, 0.5f);
+        // Enemy defeated
         public void Defeat() => source.PlayOneShot(defeat, 0.7f);
+        // Damage to the player
         public void Hurt() => source.PlayOneShot(hurt);
+        // health restoration
         public void Heal() => source.PlayOneShot(heal);
+        // Mute toggle
         public void ToggleMute() { Muted = !Muted; source.mute = Muted; }
+        // Stops sounds 
         public void Stop() => source.Stop();
+        // Destroys the generated audio clips when they are no longer needed.
         public void Dispose()
         {
             Object.Destroy(cast);

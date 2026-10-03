@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace ArcaneSurvival
 {
-    // IMGUI keeps setup dependency-free. It is sufficient for this small desktop game.
+    // Keep the game dependency free
     public sealed class GameHUD : MonoBehaviour
     {
         private ArcaneGame game;
@@ -11,8 +11,10 @@ namespace ArcaneSurvival
         private readonly Color mint = new Color32(130, 242, 219, 255);
         private readonly Color pale = new Color32(232, 239, 253, 255);
         private readonly Color muted = new Color32(153, 172, 197, 255);
+        // Connects the game statistics displayed on the screen with the game
         public void Initialize(ArcaneGame owner) => game = owner;
 
+        // Scales and draws the game statistics and other interface elements on the screen
         private void OnGUI()
         {
             if (game == null || game.Player == null) return;
@@ -38,7 +40,7 @@ namespace ArcaneSurvival
             Text(new Rect(425, 58, 600, 22), "BEST " + game.Best + "    /    WISPS DEFEATED " + game.Kills, 12, muted);
             Text(new Rect(1048, 57, 185, 24), "HEALTH", 11, muted);
             Panel(new Rect(26, 660, 1228, 40), new Color(0.035f, 0.055f, 0.10f, 0.94f));
-            Text(new Rect(43, 665, 1190, 28), "WASD / ARROWS  move     SPACE  auto-aim cast     LEFT MOUSE  aim + cast     P / ESC  pause     M  " +
+            Text(new Rect(43, 665, 1190, 28), "WASD / ARROWS  move     LEFT MOUSE  aim + cast     P / ESC  pause     M  " +
                 (game.Sounds.Muted ? "unmute" : "mute"), 14, muted, TextAnchor.MiddleCenter);
 
             if (game.State == GameState.Playing && game.NoticeTime > 0)
@@ -48,6 +50,7 @@ namespace ArcaneSurvival
             GUI.color = previousColor;
         }
 
+        // Create the title, pause and also gameover pannel
         private void DrawOverlay()
         {
             Panel(new Rect(0, 100, 1280, 550), new Color(0.02f, 0.03f, 0.07f, 0.72f));
@@ -63,7 +66,7 @@ namespace ArcaneSurvival
                 : paused ? "Your run is paused.\nThe arena will wait for you.\n\nPress P or Escape to resume."
                 : "Score  " + game.Score + "     |     Best  " + game.Best +
                   "\nSurvived  " + TimeLabel(game.Elapsed) + "     |     Wave  " + game.Wave +
-                  "\n\nKeep moving and hold Space to cast.";
+                  "\n\nKeep moving and Left Click to cast.";
             Text(new Rect(398, 290, 484, 155), body, 19, muted, TextAnchor.MiddleCenter);
             GUI.backgroundColor = mint;
             if (GUI.Button(new Rect(435, 468, 410, 51), paused ? "RESUME" : title ? "ENTER THE CIRCLE" : "TRY AGAIN", button))
@@ -75,6 +78,7 @@ namespace ArcaneSurvival
                 14, muted, TextAnchor.MiddleCenter);
         }
 
+        // Rectangle in the background
         private void Panel(Rect rect, Color color)
         {
             GUI.color = color;
@@ -90,6 +94,7 @@ namespace ArcaneSurvival
             GUI.Label(rect, value, label);
         }
 
+        // Creates minutes and seconds in the game
         private static string TimeLabel(float time) => ((int)time / 60).ToString("00") + ":" + ((int)time % 60).ToString("00");
     }
 }

@@ -5,9 +5,9 @@ using UnityEngine.InputSystem;
 
 namespace ArcaneSurvival
 {
-    // Supports either Unity input backend without requiring an Input Actions asset.
     public static class GameInput
     {
+        // Creates players movement using AWSD
         public static Vector2 Move
         {
             get
@@ -30,6 +30,7 @@ namespace ArcaneSurvival
             }
         }
 
+        // Input when the player uses the left mouse button to fire a spell
         public static bool MouseFire
         {
             get
@@ -42,6 +43,7 @@ namespace ArcaneSurvival
             }
         }
 
+        // returns mouse position
         public static Vector2 MousePosition
         {
             get
@@ -54,18 +56,8 @@ namespace ArcaneSurvival
             }
         }
 
-        public static bool SpaceHeld
-        {
-            get
-            {
-#if ENABLE_INPUT_SYSTEM
-                return Keyboard.current != null && Keyboard.current.spaceKey.isPressed;
-#else
-                return Input.GetKey(KeyCode.Space);
-#endif
-            }
-        }
 
+        // Checks if Enter was pressed 
         public static bool Confirm
         {
             get
@@ -78,6 +70,7 @@ namespace ArcaneSurvival
             }
         }
 
+        // Checks if P or Esc is pressed to pause the game
         public static bool Pause
         {
             get
@@ -90,6 +83,7 @@ namespace ArcaneSurvival
             }
         }
 
+        // Checks if R was pressed to restart
         public static bool Restart
         {
             get
@@ -102,6 +96,7 @@ namespace ArcaneSurvival
             }
         }
 
+        // Check if M was pressed to mute or unmute
         public static bool Mute
         {
             get

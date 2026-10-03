@@ -6,6 +6,7 @@ namespace ArcaneSurvival.Editor
 {
     public static class ArcaneTools
     {
+        // Prompts to save any scene edits, then opens the Arcane Survival scene.
         [MenuItem("Tools/Arcane Survival/Open Game Scene")]
         public static void OpenScene()
         {
@@ -13,6 +14,7 @@ namespace ArcaneSurvival.Editor
             EditorSceneManager.OpenScene("Assets/ArcaneSurvival/Scenes/ArcaneSurvival.unity");
         }
 
+        // Runs 14 deterministic rule checks and logs success if every check passes.
         [MenuItem("Tools/Arcane Survival/Run Logic Tests")]
         public static void RunLogicTests()
         {
@@ -39,6 +41,7 @@ namespace ArcaneSurvival.Editor
             Debug.Log("Arcane Survival: " + passed + " logic checks passed. Play-test checklist: TESTING.md.");
         }
 
+        // Counts a passing check or throws an exception naming the failed check.
         private static void Check(bool condition, string name, ref int passed)
         {
             if (!condition) throw new System.Exception("Arcane Survival test failed: " + name);
